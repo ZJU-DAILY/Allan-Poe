@@ -71,7 +71,7 @@ Allan-Poe is built as a Python extension module using CMake.
 Allan-Poe exposes two primary APIs via Python: `build_index` and `search_index`.
 
 ### 1. Data Preparation
-Ensure your data is in the correct binary formats (aligned with `load_data` and `load_sparse_data` in the source):
+Ensure your data is in the correct binary formats:
 * **Dense Vectors:** `.fvecs` format.
 * **Statistical/Learned Sparse Vectors:** Binary files beginning with the number of non-zero elements (unsigned int) and following offsets, indices, and values (CSR format).
 * **Knowledge Graph/Map of Entity to Documents/Queried Entities:** Binary files beginning with the number of entities and non-zero elements (unsigned int) and following offsets, indices of entities/documents.
