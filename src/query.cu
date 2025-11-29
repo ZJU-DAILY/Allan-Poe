@@ -144,6 +144,39 @@ void cal_precision(vector<vector<unsigned>>& v1,vector<vector<unsigned>>& v2){
     cout << "nDCG@10: " << nDCG / v1.size() << endl;
 }
 
+// compute hybrid distance on CPU
+void compute_hybrid_dis(float* a, float* b, unsigned dim, unsigned* idx1, float* val1, unsigned len1, unsigned* idx2, float* val2, unsigned len2, unsigned* bm25_idx1, float* bm25_val1, unsigned bm25_len1, unsigned* bm25_idx2, float* bm25_val2, unsigned bm25_len2, vector<float>&res_vec1, vector<float>&res_vec2, vector<float>&res_vec3){
+    float res_dis = 0.0;
+    for(unsigned i = 0; i < dim; i++){
+        res_dis += (a[i] * b[i]);
+    }
+    res_vec1.push_back(-res_dis);
+    res_dis = 0.0;
+    unsigned p1 = 0, p2 = 0;
+    while(p1 < len1 && p2 < len2){
+        if(idx1[p1] < idx2[p2]) p1++;
+        else if(idx1[p1] > idx2[p2]) p2++;
+        else{
+            res_dis += val1[p1] * val2[p2];
+            p1++;
+            p2++;
+        }
+    }
+    res_vec2.push_back(-res_dis);
+    res_dis = 0.0;
+    unsigned bm25_p1 = 0, bm25_p2 = 0;
+    while(bm25_p1 < bm25_len1 && bm25_p2 < bm25_len2){
+        if(bm25_idx1[bm25_p1] < bm25_idx2[bm25_p2]) bm25_p1++;
+        else if(bm25_idx1[bm25_p1] > bm25_idx2[bm25_p2]) bm25_p2++;
+        else{
+            res_dis += bm25_val1[bm25_p1] * bm25_val2[bm25_p2];
+            bm25_p1++;
+            bm25_p2++;
+        }
+    }
+    res_vec3.push_back(-res_dis);
+}
+
 // merge two neighbor lists according to the distances
 __device__ void merge_top(unsigned* arr1, unsigned* arr2, float* arr1_val, float* arr2_val, unsigned tid, unsigned TOPM){
     unsigned res_id_vec[(MAX_CAND_POOL + K+6*32-1)/ (6*32)] = {0};
@@ -1810,6 +1843,27 @@ void search_index_impl(
     }
 
     cout << "Dense weight: " << dense_weight << ", Sparse weight: " << sparse_weight << ", BM25 weight: " << bm25_weight << ", KG weight: " << kg_weight << endl;
+
+    vector<float> res1, res2, res3;
+    for(unsigned i = 0; i < min(points_num, 100); i++){
+        for(unsigned j = 0; j < min(query_num, 100); j++){
+            unsigned aa = j, bb = i;
+            compute_hybrid_dis(data_load + aa * dim, query_load + bb * dim, dim, sparse_idx + sparse_off[aa], sparse_val + sparse_off[aa], sparse_off[aa+1] - sparse_off[aa], sparse_idx_query + sparse_off_query[bb], sparse_val_query + sparse_off_query[bb], sparse_off_query[bb+1] - sparse_off_query[bb], bm25_idx + bm25_off[aa], bm25_val + bm25_off[aa], bm25_off[aa+1] - bm25_off[aa], bm25_idx_query + bm25_off_query[bb], bm25_val_query + bm25_off_query[bb], bm25_off_query[bb+1] - bm25_off_query[bb], res1, res2, res3);
+        }
+    }
+    sort(res1.begin(), res1.end());
+    sort(res2.begin(), res2.end());
+    sort(res3.begin(), res3.end());
+
+    if((-res2[0]) > (-res3[0])){
+        sparse_weight *= (res3[0]/res2[0]);
+        dense_weight *= (res3[0]/res1[0]);
+    }
+    else{
+        bm25_weight *= (res2[0]/res3[0]);
+        dense_weight *= (res2[0]/res1[0]);
+    }
+
     for(unsigned i = 0; i < query_num; i++){
         for(unsigned j = 0; j < dim; j++){
             query_load[i * dim + j] *= dense_weight;
