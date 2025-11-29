@@ -25,7 +25,7 @@ hybrid_search.search_index(
     top_k=10,
     cands=128,
     sparse_weight=1.0,
-    bm25_weight=0.0,
-    dense_weight=0.0,
-    kg_weight=0.0
+    bm25_weight=1.0,
+    dense_weight=1.0,
+    kg_weight=40.0
 )
