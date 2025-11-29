@@ -114,9 +114,9 @@ hybrid_search.search_index(
     ground_truth_path="example_data/2wiki_qrels.txt",
     top_k=10,
     cands=128,          # Size of candidates pool
-    sparse_weight=2.0,  # Weight for learned sparse vectors
+    sparse_weight=1.0,  # Weight for learned sparse vectors
     bm25_weight=1.0,    # Weight for statistical sparse vectors
-    dense_weight=70.0,  # Weight for dense vectors
+    dense_weight=1.0,  # Weight for dense vectors
     kg_weight=40.0      # Weight for the knowledge graph
 )
 ```
