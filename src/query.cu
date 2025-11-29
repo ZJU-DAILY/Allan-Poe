@@ -1855,13 +1855,17 @@ void search_index_impl(
     sort(res2.begin(), res2.end());
     sort(res3.begin(), res3.end());
 
-    if((-res2[0]) > (-res3[0])){
+    if((-res2[0]) > (-res3[0]) && (-res2[0]) > (-res1[0])){
+        bm25_weight *= (res2[0]/res3[0]);
+        dense_weight *= (res2[0]/res1[0]);
+    }
+    else if((-res3[0]) > (-res2[0]) && (-res3[0]) > (-res1[0])){
         sparse_weight *= (res3[0]/res2[0]);
         dense_weight *= (res3[0]/res1[0]);
     }
-    else{
-        bm25_weight *= (res2[0]/res3[0]);
-        dense_weight *= (res2[0]/res1[0]);
+    else if((-res1[0]) > (-res2[0]) && (-res1[0]) > (-res3[0])){
+        sparse_weight *= (res1[0]/res2[0]);
+        bm25_weight *= (res1[0]/res3[0]);
     }
 
     for(unsigned i = 0; i < query_num; i++){
