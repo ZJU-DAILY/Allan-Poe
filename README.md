@@ -1,10 +1,10 @@
 # All-in-one Graph-based Indexing for Hybrid Search on GPUs
 
-**Allan-Poe** is a unified, GPU-accelerated graph-based index designed for efficient hybrid search. It overcomes the limitations of "separate-then-fuse" retrieval paradigms by integrating dense vectors, sparse vectors, full-text search, and knowledge graphs into a single, cohesive structure.
+**Allan-Poe** is a unified, GPU-accelerated graph-based index designed for efficient hybrid search. It overcomes the limitations of "separate-then-fuse" retrieval paradigms by integrating dense vectors, sparse vectors, and full-text search into a single, cohesive structure.
 
 ## Key Features
 
-* **Unified Semantic Metric Space (USMS):** Fuses heterogeneous retrieval paths (dense, sparse, keyword, knowledge graph) into a single high-dimensional representation without requiring index reconstruction for different weights.
+* **Unified Semantic Metric Space (USMS):** Fuses heterogeneous retrieval paths (dense, sparse, keyword) into a single high-dimensional representation without requiring index reconstruction for different weights.
 * **GPU-Accelerated Construction:** Utilizes GPUs for massive parallelism in hybrid distance calculations and graph optimization, achieving significant speedups over CPU-based methods.
 * **Dynamic Fusion Framework:** Supports arbitrary weights for different retrieval paths at query time, allowing flexible adjustment between semantic, lexical, and logical matching.
 * **Advanced Pruning Strategies:**
